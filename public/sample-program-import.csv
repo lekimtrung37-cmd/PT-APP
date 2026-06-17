@@ -1,0 +1,17 @@
+
+,,,,,,,,,,,,
+"Lưu ý: Bạn có thể xóa các dòng ví dụ này. Dòng header sẽ được tự động nhận diện.",,,,,,,,,,,,
+"Header không nhất thiết phải ở dòng đầu tiên, nhưng các cột phải chứa các từ khóa 'Week', 'Workout', 'Exercise' để được nhận diện.",,,,,,,,,,,,
+,,,,,,,,,,,,
+Week,Workout,Exercise,WorkingSets,RepsOrDuration,LoadKg,Intensity,Rest,Notes
+1,"Ngày 1: Đẩy ngực, vai, tay sau","Barbell Bench Press",4,6-8,80,8,90,"Gồng chắc core, không để võng lưng"
+,"","Incline Dumbbell Press",3,10-12,25,8,60,"Hạ tạ có kiểm soát"
+,"","Overhead Press",3,8-10,40,7,60,
+,"","Triceps Pushdown",3,12-15,20,,45,
+1,"Ngày 2: Kéo lưng, xô, tay trước","Deadlift",5,5,140,8,120,"Giữ lưng thẳng tuyệt đối"
+,"","Pull-up",4,"Max",,9,90,"Có thể dùng dây trợ lực nếu cần"
+,"","Barbell Row",4,8-10,70,8,60,
+,"","Bicep Curl",3,12-15,12,,45,
+2,"Ngày 1: Đẩy ngực, vai, tay sau","Barbell Bench Press",4,6-8,82.5,8,90,"Tăng nhẹ khối lượng tạ so với tuần 1"
+,"","Incline Dumbbell Press",3,10-12,27.5,8,60,
+,,,,,,,,,,,,

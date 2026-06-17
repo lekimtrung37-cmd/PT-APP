@@ -1,0 +1,566 @@
+
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user in the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the user (e.g., user, pt, admin)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the user."
+        },
+        "profileImageUrl": {
+          "type": "string",
+          "description": "URL of the user's profile image.",
+          "format": "uri"
+        },
+        "assignedPtId": {
+          "type": "string",
+          "description": "The ID of the personal trainer assigned to this user."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the user account.",
+          "enum": ["Active", "Inactive", "Pending Activation"]
+        },
+        "onboardingData": {
+          "type": "object",
+          "description": "User's or Trainer's onboarding survey data."
+        },
+        "ptNote": {
+            "type": "string",
+            "description": "Private notes from the trainer about the client."
+        },
+        "sessions": {
+            "type": "object",
+            "description": "Training package session information.",
+            "properties": {
+                "remaining": { "type": "number"},
+                "total": { "type": "number"}
+            }
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "role",
+        "name"
+      ]
+    },
+    "TrainerProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TrainerProfile",
+      "type": "object",
+      "description": "Represents a profile for a personal trainer.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the trainer profile."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:1 TrainerProfile)"
+        },
+        "specialty": {
+          "type": "string",
+          "description": "Primary specialty of the trainer."
+        },
+        "bio": {
+          "type": "string",
+          "description": "Biography of the trainer."
+        },
+        "clientIds": {
+            "type": "array",
+            "description": "An array of user IDs for the clients assigned to this trainer.",
+            "items": {
+                "type": "string"
+            }
+        },
+        "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of when the trainer profile was created."
+        }
+      },
+      "required": [
+        "id",
+        "userId"
+      ]
+    },
+    "Exercise": {
+        "title": "Exercise",
+        "type": "object",
+        "description": "A single exercise definition in the library.",
+        "properties": {
+            "ten": { "type": "string", "description": "Tên của bài tập." },
+            "moTaNgan": { "type": "string", "description": "Mô tả ngắn gọn về bài tập." },
+            "videoUrl": { "type": "string", "format": "uri", "description": "URL video hướng dẫn." },
+            "nhomCo": { "type": "array", "items": { "type": "string" }, "description": "Các nhóm cơ chính tác động." },
+            "dangBai": { "type": "array", "items": { "type": "string" }, "description": "Dạng bài tập (ví dụ: compound, isolation)." },
+            "pattern": { "type": "array", "items": { "type": "string" }, "description": "Mẫu chuyển động (push, pull, squat, hinge, carry, core)." },
+            "tags": { "type": "array", "items": { "type": "string" }, "description": "Mảng các tags để tìm kiếm và lọc nhanh." },
+            "taoLuc": { "type": "object", "description": "Server timestamp lúc tạo." },
+            "capNhatLuc": { "type": "object", "description": "Server timestamp lúc cập nhật." },
+            "taoBoi": { "type": "string", "description": "UID của người tạo." },
+            "ownerType": { "type": "string", "enum": ["admin", "trainer"], "description": "Xác định bài tập thuộc kho chung hay kho riêng." }
+        },
+        "required": ["ten", "taoLuc", "taoBoi", "ownerType"]
+    },
+    "ExerciseBlock": {
+      "title": "Exercise Block",
+      "type": "object",
+      "description": "A block representing a single exercise within a workout session.",
+      "properties": {
+        "tenBaiTap": { "type": "string" },
+        "sets": { "type": "string" },
+        "repsOrDuration": { "type": "string" },
+        "rpe": { "type": "string" },
+        "rest": { "type": "string" },
+        "tempo": { "type": "string" },
+        "loadKg": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["tenBaiTap"]
+    },
+    "ProgramWorkout": {
+      "title": "Program Workout",
+      "type": "object",
+      "description": "A single training workout within a program template. This was formerly ProgramSession.",
+      "properties": {
+        "thuTu": { "type": "number", "description": "The order of the workout within a week." },
+        "tieuDeBuoi": { "type": "string" },
+        "exercises": { "type": "array", "items": { "$ref": "#/entities/ExerciseBlock" } },
+        "ghiChuPT": { "type": "string" }
+      },
+      "required": ["thuTu", "tieuDeBuoi"]
+    },
+    "ProgramTemplate": {
+      "title": "Program Template",
+      "type": "object",
+      "description": "A reusable program template.",
+      "properties": {
+        "ten": { "type": "string" },
+        "moTaNgan": { "type": "string" },
+        "ownerType": { "type": "string", "enum": ["admin", "trainer"] },
+        "ownerId": { "type": "string" },
+        "taoLuc": { "type": "object" },
+        "capNhatLuc": { "type": "object" },
+        "isHidden": { "type": "boolean", "description": "If true, the template is hidden from trainer's public library view." }
+      },
+      "required": ["ten", "ownerType", "ownerId"]
+    },
+    "Lead": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Lead",
+      "type": "object",
+      "description": "Represents a potential customer who submitted their information.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "socialLink": { "type": "string" },
+        "service": { "type": "string" },
+        "preferredTime": { "type": "string" },
+        "source": { "type": "string", "description": "Where the lead came from, e.g., 'workout_plan_download'." },
+        "submittedAt": { "type": "string", "format": "date-time" },
+        "fitnessGoal": { "type": "string" },
+        "challenge": { "type": "string" },
+        "whyCoach": { "type": "string" },
+        "investmentLevel": { "type": "string" },
+        "startTimeframe": { "type": "string" }
+      },
+      "required": ["email", "submittedAt", "name", "phone", "service"]
+    },
+    "TrainingPlan": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TrainingPlan",
+      "type": "object",
+      "description": "Represents a training plan for a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the training plan."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the training plan."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the training plan."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "name"
+      ]
+    },
+     "Workout": {
+      "title": "Workout",
+      "description": "A specific workout session within a training plan.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "title": { "type": "string" },
+        "week": { "type": "number" },
+        "weekTitle": { "type": "string" },
+        "exercises": {
+          "type": "array",
+          "items": { "$ref": "#/entities/ExerciseBlock" }
+        },
+        "dailyNote": {
+          "type": "string",
+          "description": "A note for the specific day, added by the trainer."
+        },
+        "isCompleted": {
+            "type": "boolean",
+            "description": "Whether the workout session has been marked as completed by the trainer."
+        }
+      },
+      "required": ["id", "date", "title", "exercises"]
+    },
+    "DailyCheckIn": {
+      "title": "Daily Check-In",
+      "description": "Represents a user's daily check-in for mood and sleep.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "mood": { "type": "string", "enum": ["great", "ok", "sad", "stressed"]},
+        "sleep": { "type": "string", "enum": ["less_than_5", "5-6", "7-8", "more_than_8"]}
+      },
+      "required": [ "userId", "date", "mood", "sleep"]
+    },
+    "FoodLog": {
+        "title": "Food Log",
+        "description": "A single food log entry from a client.",
+        "type": "object",
+        "properties": {
+            "id": { "type": "string" },
+            "userId": { "type": "string" },
+            "date": { "type": "string", "format": "date" },
+            "description": { "type": "string" },
+            "imageUrl": { "type": "string", "format": "uri" },
+            "storagePath": { "type": "string" },
+            "createdAt": { "type": "object" }
+        },
+        "required": ["userId", "date"]
+    },
+    "ProgressMetric": {
+        "title": "Progress Metric",
+        "description": "A single data point for a user's progress, like weight or measurements.",
+        "type": "object",
+        "properties": {
+            "id": {"type": "string"},
+            "userId": {"type": "string"},
+            "date": {"type": "string", "format": "date"},
+            "weight": {"type": "number"},
+            "bodyFat": {"type": "number"},
+            "measurements": {
+                "type": "object",
+                "properties": {
+                    "chest": {"type": "number"},
+                    "waist": {"type": "number"},
+                    "hips": {"type": "number"}
+                }
+            }
+        },
+        "required": ["id", "userId", "date"]
+    },
+    "PersonalRecord": {
+        "title": "Personal Record",
+        "description": "A user's personal best for a specific exercise.",
+        "type": "object",
+        "properties": {
+            "id": {"type": "string"},
+            "userId": {"type": "string"},
+            "exercise": {"type": "string"},
+            "record": {"type": "string"},
+            "date": {"type": "string", "format": "date"}
+        },
+        "required": ["id", "userId", "exercise", "record", "date"]
+    },
+    "ProgressPhoto": {
+        "title": "Progress Photo",
+        "description": "A photo uploaded by the user to track visual progress.",
+        "type": "object",
+        "properties": {
+            "id": {"type": "string"},
+            "userId": {"type": "string"},
+            "date": {"type": "string", "format": "date"},
+            "imageUrl": {"type": "string", "format": "uri"}
+        },
+        "required": ["id", "userId", "date", "imageUrl"]
+    },
+    "NutritionPlanItem": {
+      "title": "Nutrition Plan Item",
+      "description": "A single item in a user's daily nutrition and lifestyle plan, such as a meal or a habit.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["meal", "habit"] },
+        "time": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["id", "type", "time", "description"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Represents a scheduled appointment between a trainer and a client.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "trainerId": { "type": "string" },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "startAt": { "type": "object", "description": "Firebase Timestamp" },
+        "endAt": { "type": "object", "description": "Firebase Timestamp" },
+        "notes": { "type": "string" },
+        "workoutId": { "type": "string", "description": "Link to a specific workout document" },
+        "createdBy": { "type": "string", "description": "UID of the user (PT or client) who created the event" }
+      },
+      "required": ["id", "title", "startAt", "endAt"]
+    },
+    "WorkoutTemplate": {
+      "title": "Workout Template",
+      "description": "A reusable workout plan template created by a trainer.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "folderId": { "type": "string", "description": "The ID of the folder this template belongs to." },
+        "data": { "$ref": "#/entities/Workout" }
+      },
+      "required": ["id", "name", "data"]
+    },
+    "WorkoutFolder": {
+      "title": "Workout Folder",
+      "description": "A folder to organize workout templates.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" }
+      },
+      "required": ["id", "name"]
+    },
+    "SessionHistory": {
+        "title": "Session History",
+        "description": "A record of a session transaction (add, use, correction).",
+        "type": "object",
+        "properties": {
+            "id": {"type": "string"},
+            "date": {"type": "string", "format": "date-time"},
+            "type": {"type": "string", "enum": ["add", "use", "correction"]},
+            "amount": {"type": "number"},
+            "notes": {"type": "string"},
+            "ptId": {"type": "string"},
+            "relatedWorkoutId": {"type": "string"}
+        },
+        "required": ["id", "date", "type", "amount", "ptId"]
+    },
+    "Notification": {
+        "title": "Notification",
+        "description": "A notification for a user.",
+        "type": "object",
+        "properties": {
+            "id": { "type": "string" },
+            "userId": { "type": "string", "description": "The ID of the user this notification is for." },
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "link": { "type": "string", "format": "uri" },
+            "isRead": { "type": "boolean" },
+            "createdAt": { "type": "object", "description": "Server timestamp of when the notification was created." }
+        },
+        "required": ["userId", "title", "isRead", "createdAt"]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "google.com"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/User" },
+          "description": "Stores core user data, including their role (user, pt, admin)."
+        }
+      },
+       {
+        "path": "/users/{userId}/sessionHistory/{historyId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/SessionHistory" },
+          "description": "Stores the history of session transactions for a client."
+        }
+      },
+      {
+        "path": "/users/{userId}/foodLogs/{logId}",
+        "definition": {
+            "schema": { "$ref": "#/entities/FoodLog" },
+            "description": "Stores the food log entries for a client."
+        }
+       },
+       {
+        "path": "/users/{userId}/notifications/{notificationId}",
+        "definition": {
+            "schema": { "$ref": "#/entities/Notification" },
+            "description": "Stores notifications for a specific user."
+        }
+       },
+      {
+        "path": "/trainerProfiles/{trainerId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/TrainerProfile" },
+          "description": "Stores public profiles for personal trainers, linked to their user ID."
+        }
+      },
+      {
+        "path": "/users/{userId}/trainingPlans/{planId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/TrainingPlan" },
+          "description": "Stores training plans for each user. Only the user and their PT can access."
+        }
+      },
+       {
+        "path": "/users/{userId}/workouts/{workoutId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/Workout" },
+          "description": "Stores specific workouts for a user, forming their training log."
+        }
+      },
+      {
+        "path": "/users/{userId}/checkins/{checkinId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/DailyCheckIn" },
+          "description": "Stores daily check-in data for a user."
+        }
+      },
+      {
+        "path": "/users/{userId}/progressMetrics/{metricId}",
+        "definition": {
+            "schema": {"$ref": "#/entities/ProgressMetric"},
+            "description": "Stores time-series progress data for a user."
+        }
+      },
+      {
+        "path": "/users/{userId}/personalRecords/{recordId}",
+        "definition": {
+            "schema": {"$ref": "#/entities/PersonalRecord"},
+            "description": "Stores personal bests for a user."
+        }
+      },
+       {
+        "path": "/users/{userId}/progressPhotos/{photoId}",
+        "definition": {
+            "schema": {"$ref": "#/entities/ProgressPhoto"},
+            "description": "Stores progress photos for a user."
+        }
+      },
+      {
+        "path": "/users/{userId}/nutritionPlan/{itemId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/NutritionPlanItem" },
+          "description": "Stores items for a user's daily nutrition and lifestyle plan."
+        }
+      },
+       {
+        "path": "/users/{userId}/workoutFolders/{folderId}",
+        "definition": {
+            "schema": {"$ref": "#/entities/WorkoutFolder"},
+            "description": "Stores a trainer's custom folders for organizing workout templates."
+        }
+      },
+       {
+        "path": "/users/{trainerId}/workoutTemplates/{templateId}",
+        "definition": {
+            "schema": {"$ref": "#/entities/WorkoutTemplate"},
+            "description": "A trainer's private library of workout templates."
+        }
+      },
+      {
+        "path": "/publicExercises/{exerciseId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/Exercise" },
+          "description": "A public library of exercises managed by Admins."
+        }
+      },
+      {
+        "path": "/trainerExercises/{trainerId}/items/{exerciseId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/Exercise" },
+          "description": "A private library of exercises managed by a specific trainer."
+        }
+      },
+       {
+        "path": "/programTemplatesPublic/{templateId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/ProgramTemplate" },
+          "description": "A public library of program templates managed by Admins."
+        }
+      },
+       {
+        "path": "/programTemplatesPublic/{templateId}/sessions/{sessionId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/ProgramWorkout" },
+          "description": "A session within a public program template."
+        }
+      },
+       {
+        "path": "/programTemplatesTrainer/{trainerId}/items/{templateId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/ProgramTemplate" },
+          "description": "A private library of program templates managed by a specific trainer."
+        }
+      },
+       {
+        "path": "/programTemplatesTrainer/{trainerId}/items/{templateId}/sessions/{sessionId}",
+        "definition": {
+          "schema": { "$ref": "#/entities/ProgramWorkout" },
+          "description": "A session within a private program template."
+        }
+      },
+      {
+        "path": "/appointments/{appointmentId}",
+        "definition": {
+            "schema": {"$ref": "#/entities/Appointment"},
+            "description": "Stores all appointments in a root collection for simplified querying."
+        }
+      },
+      {
+        "path": "/leads/{leadId}",
+        "definition": {
+            "schema": {"$ref": "#/entities/Lead"},
+            "description": "Stores emails collected from the lead magnet form in the footer."
+        }
+      }
+    ],
+    "reasoning": "The data structure is normalized to reduce data duplication. All user-specific data is nested under the user's document for easy access and security rule enforcement, except for appointments and leads, which are in a root collection for simplified querying and public access respectively. Workout templates and folders are also nested under the user (trainer) who creates them."
+  }
+}

@@ -1,0 +1,46 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isAssignedTrainer(clientId) {
+      let clientDoc = get(/databases/$(database)/documents/users/$(clientId));
+      return clientDoc.data.assignedPtId == request.auth.uid;
+    }
+    
+    function isParticipant(conversationId) {
+        return request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantIds;
+    }
+
+    // Mặc định từ chối tất cả
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // Ảnh đại diện có thể đọc công khai, chỉ chủ sở hữu được ghi
+    match /avatars/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null && isOwner(userId);
+    }
+    
+    // Nhật ký ăn uống có thể được ghi bởi chủ sở hữu, đọc bởi chủ sở hữu và PT được gán
+    match /food_logs/{clientId}/{fileName} {
+      allow read: if request.auth != null && (isOwner(clientId) || isAssignedTrainer(clientId));
+      allow write: if request.auth != null && isOwner(clientId);
+    }
+    
+    // Ảnh tiến độ có thể được đọc/ghi bởi chủ sở hữu và PT được gán
+    match /progress_photos/{clientId}/{fileName} {
+      allow read, write: if request.auth != null && (isOwner(clientId) || isAssignedTrainer(clientId));
+    }
+
+    // Tệp trong cuộc trò chuyện có thể được đọc/ghi bởi những người tham gia
+    match /chat_files/{conversationId}/{fileName} {
+      allow read, write: if request.auth != null && exists(/databases/$(database)/documents/conversations/$(conversationId)) && isParticipant(conversationId);
+    }
+  }
+}

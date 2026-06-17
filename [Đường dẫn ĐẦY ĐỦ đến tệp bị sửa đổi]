@@ -1,0 +1,4 @@
+...]]></content>` (Nội dung thi công cuối cùng):**
+    *   Đây là phần quan trọng nhất. Thay vì nói "hãy thêm dòng này, xóa dòng kia" (giống như một file diff), tôi cung cấp **toàn bộ nội dung cuối cùng** của tệp đó.
+    *   "Đội thi công" (hệ thống) sẽ không cần suy nghĩ. Nó chỉ cần xóa toàn bộ nội dung cũ của tệp và thay thế bằng chính xác nội dung mới mà tôi cung cấp trong thẻ này.
+    *   **`<![CDATA[...
